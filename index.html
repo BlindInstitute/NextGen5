@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plan A — Screen Reader Proficiency Assessment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+
+  <style>
+    :root {
+      --border: #dcdcdc;
+      --button-blue: #0a63ff;
+      --background: #ffffff;
+      --text: #111111;
+      --panel-background: #ffffff;
+      --focus-outline: #111111;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --border: #2a3440;
+        --background: #101418;
+        --text: #f4f4f4;
+        --panel-background: #141a20;
+        --focus-outline: #ffffff;
+      }
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.5;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: .75rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--panel-background);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      max-width: 30rem;
+      padding: .8rem 1rem;
+      margin-top: .75rem;
+      border-radius: .6rem;
+      border: 2px solid var(--button-blue);
+      background: var(--button-blue);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--button-blue);
+    }
+
+    .btn[disabled] {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .block-btn {
+      display: block;
+      width: 100%;
+      max-width: 30rem;
+      margin-top: 1.5rem;
+      padding: .8rem 1rem;
+      border-radius: .6rem;
+      border: 2px solid var(--button-blue);
+      background: var(--button-blue);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin: .5rem 0 .2rem;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      max-width: 30rem;
+      padding: .45rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: auto;
+      max-width: none;
+      margin-right: .4rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: .75rem;
+    }
+
+    th,
+    td {
+      border: 1px solid #999;
+      padding: .5rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    caption {
+      text-align: left;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      margin: .75rem 0 1rem;
+    }
+
+    legend {
+      font-weight: 700;
+    }
+
+    .note {
+      opacity: .85;
+    }
+
+    .stack > * + * {
+      margin-top: .75rem;
+    }
+
+    .toolbar {
+      display: block;
+      margin-top: 1rem;
+    }
+
+    .toolbar > * + * {
+      margin-top: .75rem;
+    }
+
+    .button-group {
+      margin-top: 1rem;
+    }
+
+    .button-group > * + * {
+      margin-top: .75rem;
+    }
+
+    :focus {
+      outline: 3px solid var(--focus-outline);
+      outline-offset: 2px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+<header class="wrap" role="banner">
+  <h1 id="appTitle">Plan A — Screen Reader Proficiency Assessment</h1>
+  <p id="progressText" class="note" aria-live="polite">Progress: Home</p>
+</header>
+
+<main class="wrap" role="main">
+
+  <section id="homeSection" class="panel assessment-section" aria-labelledby="homeHeading">
+    <h2 id="homeHeading" tabindex="-1">Screen Reader Proficiency Assessment</h2>
+
+    <form id="preForm" class="stack" novalidate>
+      <p>
+        Welcome to the Screen Reader Proficiency Assessment.
+      </p>
+
+      <p>
+        This assessment consists of a series of workplace tasks. Complete each task using your keyboard and screen reader in the manner that is most comfortable and efficient for you.
+      </p>
+
+      <p>
+        Throughout the assessment, your task completion, answers, time spent, focus movement, mouse activity, and other interaction metrics may be recorded.
+      </p>
+
+      <p>
+        Before beginning, review the acknowledgements and check the required boxes.
+      </p>
+
+      <fieldset>
+        <legend>Announcements</legend>
+        <label><input type="checkbox" id="deferPolite" checked> Defer non-critical announcements during tasks</label>
+        <label><input type="checkbox" id="dedupeAlerts" checked> Prevent duplicate alerts</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Consent required</legend>
+        <label><input type="checkbox" id="homeConsent" required> I consent; timing, focus changes, mouse events, answers, and task results may be recorded.</label>
+      </fieldset>
+
+      <button type="button" id="startCalibrationBtn" class="btn" disabled>Start Assessment</button>
+
+      <p id="homeStatus" role="alert" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section id="formTaskSection" class="panel assessment-section" aria-labelledby="formTaskHeading" hidden>
+    <p class="note">Progress: Task 1 of 5</p>
+    <h2 id="formTaskHeading" tabindex="-1">Task 1 — Form Navigation and Completion</h2>
+
+    <p>
+      Complete the form using the information provided on the page.
+    </p>
+
+    <p>
+      Complete all required fields, review your entries, and activate Submit when finished.
+    </p>
+
+    <div class="button-group" role="group" aria-label="Form task controls">
+      <button type="button" id="formBeginTaskBtn" class="btn">Begin Task</button>
+      <button type="button" id="formPreviousTaskBtn" class="btn secondary">Previous Task</button>
+      <button type="button" id="formFinishTaskBtn" class="btn secondary" disabled>Submit</button>
+    </div>
+
+    <form id="formTaskForm" class="stack" novalidate hidden>
+      <label for="formFullName">Full Name</label>
+      <input id="formFullName" name="formFullName" type="text" required>
+
+      <label for="formEmail">Email Address</label>
+      <input id="formEmail" name="formEmail" type="email" required>
+
+      <label for="formFeedback">Feedback on Accessibility short comment</label>
+      <textarea id="formFeedback" name="formFeedback" rows="3" required></textarea>
+
+      <label><input type="checkbox" id="formConfirmComplete" required> I confirm this form is complete.</label>
+    </form>
+
+    <p id="formTaskStatus" role="alert" aria-live="polite"></p>
+  </section>
+
+  <section id="recordSearchSection" class="panel assessment-section" aria-labelledby="recordSearchHeading" hidden>
+    <p class="note">Progress: Task 2 of 5</p>
+    <h2 id="recordSearchHeading" tabindex="-1">Task 2 — Record Search Task</h2>
+
+    <p>
+      Locate the employee record for <strong>Jordan Lee</strong>.
+    </p>
+
+    <p>
+      Compare the employee record to the required information displayed on this page to verify that you have selected the correct record.
+    </p>
+
+    <section class="panel" aria-labelledby="recordRequiredInfoHeading">
+      <h3 id="recordRequiredInfoHeading">Required Information</h3>
+      <ul>
+        <li><strong>Department:</strong> Human Resources</li>
+        <li><strong>Status:</strong> Active</li>
+        <li><strong>Case Type:</strong> Accommodation Review</li>
+        <li><strong>Last Contact Date:</strong> May 14, 2026</li>
+        <li><strong>Owner:</strong> Maya Chen</li>
+      </ul>
+    </section>
+
+    <form id="recordSearchForm" class="stack">
+      <label for="recordSearchInput">Search records</label>
+      <input id="recordSearchInput" type="text" autocomplete="off">
+
+      <button class="btn" type="submit">Search Records</button>
+      <button class="btn secondary" type="button" id="recordResetSearchBtn">Reset Search</button>
+    </form>
+
+    <p id="recordSearchStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+
+    <h3>Search Results</h3>
+    <table>
+      <caption>Records returned by the current search.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Select</th>
+          <th scope="col">Record Name</th>
+          <th scope="col">Department</th>
+          <th scope="col">Status</th>
+          <th scope="col">Case Type</th>
+          <th scope="col">Last Contact Date</th>
+          <th scope="col">Owner</th>
+        </tr>
+      </thead>
+      <tbody id="recordSearchResultsBody">
+        <tr><td colspan="7">No search has been performed yet.</td></tr>
+      </tbody>
+    </table>
+
+    <button id="recordMoveSelectedBtn" class="btn" type="button" disabled>Move Selected Record</button>
+
+    <h3>Selected Records</h3>
+    <table>
+      <caption>Record moved from the Search Results table.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Record Name</th>
+          <th scope="col">Department</th>
+          <th scope="col">Status</th>
+          <th scope="col">Case Type</th>
+          <th scope="col">Last Contact Date</th>
+          <th scope="col">Owner</th>
+        </tr>
+      </thead>
+      <tbody id="recordSelectedRecordsBody">
+        <tr><td colspan="6">No records have been selected yet.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="button-group" role="group" aria-label="Record search task controls">
+      <button id="recordSubmitAnswerBtn" class="btn" type="button" disabled>Submit Answer</button>
+      <button id="recordPreviousTaskBtn" class="btn secondary" type="button">Previous Task</button>
+    </div>
+
+    <p id="recordAnswerStatus" role="alert" aria-live="assertive" aria-atomic="true"></p>
+  </section>
+
+  <section id="onboardingSection" class="panel assessment-section" aria-labelledby="onboardingHeading" hidden>
+    <p class="note">Progress: Task 3 of 5</p>
+    <h2 id="onboardingHeading" tabindex="-1">Task 3 — Employee Onboarding Task</h2>
+
+    <p>
+      Use the employee profile displayed on this page to complete the onboarding process.
+    </p>
+
+    <p>
+      Complete each step of the onboarding wizard, review your entries, and submit the completed onboarding task.
+    </p>
+
+    <p>
+      You may move forward and backward through the steps before submitting.
+    </p>
+
+    <section class="panel" aria-labelledby="employeeProfileHeading">
+      <h3 id="employeeProfileHeading">Employee Profile</h3>
+      <p><strong>Employee Name:</strong> Alex Martinez</p>
+      <p><strong>Employee ID:</strong> 48392</p>
+      <p><strong>Department:</strong> Human Resources</p>
+      <p><strong>Manager:</strong> Maya Chen</p>
+      <p><strong>Start Date:</strong> July 15, 2026</p>
+      <p><strong>Required Equipment:</strong> Laptop, Monitor, Screen Reader Software</p>
+    </section>
+
+    <form id="onboardingForm" class="stack" novalidate>
+      <section id="onboardingStep1" class="panel" aria-labelledby="onboardingStep1Heading">
+        <h3 id="onboardingStep1Heading" tabindex="-1">Step 1: Employee Information</h3>
+
+        <label for="onboardingFirstName">First Name</label>
+        <input id="onboardingFirstName" type="text">
+
+        <label for="onboardingLastName">Last Name</label>
+        <input id="onboardingLastName" type="text">
+
+        <label for="onboardingEmployeeId">Employee ID</label>
+        <input id="onboardingEmployeeId" type="text">
+
+        <label for="onboardingStartDate">Start Date</label>
+        <input id="onboardingStartDate" type="text" aria-describedby="onboardingDateHelp">
+        <p id="onboardingDateHelp" class="note">Enter the date using Month day, year format.</p>
+
+        <button type="button" id="onboardingNextStep1Btn" class="btn">Next Step</button>
+      </section>
+
+      <section id="onboardingStep2" class="panel" aria-labelledby="onboardingStep2Heading" hidden>
+        <h3 id="onboardingStep2Heading" tabindex="-1">Step 2: Department Assignment</h3>
+
+        <label for="onboardingDepartment">Department</label>
+        <select id="onboardingDepartment">
+          <option value="">Select department</option>
+          <option>Human Resources</option>
+          <option>Finance</option>
+          <option>Information Technology</option>
+          <option>Operations</option>
+        </select>
+
+        <label for="onboardingManager">Manager</label>
+        <select id="onboardingManager">
+          <option value="">Select manager</option>
+          <option>Maya Chen</option>
+          <option>Andre Miller</option>
+          <option>Priya Shah</option>
+          <option>RJ Holliday</option>
+        </select>
+
+        <button type="button" id="onboardingNextStep2Btn" class="btn">Next Step</button>
+        <button type="button" id="onboardingPreviousStep2Btn" class="btn secondary">Previous Step</button>
+      </section>
+
+      <section id="onboardingStep3" class="panel" aria-labelledby="onboardingStep3Heading" hidden>
+        <h3 id="onboardingStep3Heading" tabindex="-1">Step 3: Equipment Selection</h3>
+
+        <label><input type="checkbox" id="onboardingLaptop"> Laptop</label>
+        <label><input type="checkbox" id="onboardingMobileDevice"> Mobile Device</label>
+        <label><input type="checkbox" id="onboardingMonitor"> Monitor</label>
+        <label><input type="checkbox" id="onboardingPrinter"> Printer</label>
+        <label><input type="checkbox" id="onboardingScreenReader"> Screen Reader Software</label>
+        <label><input type="checkbox" id="onboardingWebcam"> Webcam</label>
+
+        <button type="button" id="onboardingReviewBtn" class="btn">Review</button>
+        <button type="button" id="onboardingPreviousStep3Btn" class="btn secondary">Previous Step</button>
+      </section>
+
+      <section id="onboardingReviewSection" class="panel" aria-labelledby="onboardingReviewHeading" hidden>
+        <h3 id="onboardingReviewHeading" tabindex="-1">Review and Submit</h3>
+        <p>Review your entries before submitting the onboarding task.</p>
+
+        <button type="button" id="onboardingSubmitBtn" class="btn">Submit Onboarding</button>
+        <button type="button" id="onboardingPreviousReviewBtn" class="btn secondary">Previous Step</button>
+      </section>
+    </form>
+
+    <div class="button-group" role="group" aria-label="Onboarding task controls">
+      <button id="onboardingPreviousTaskBtn" class="btn secondary" type="button">Previous Task</button>
+    </div>
+
+    <p id="onboardingStatus" role="alert" aria-live="assertive" aria-atomic="true"></p>
+  </section>
+
+  <section id="inboxTriageSection" class="panel assessment-section" aria-labelledby="inboxTriageHeading" hidden>
+    <p class="note">Progress: Task 4 of 5</p>
+    <h2 id="inboxTriageHeading" tabindex="-1">Task 4 — Inbox Triage Task</h2>
+
+    <p>
+      Review the inbox and locate the requested email.
+    </p>
+
+    <p>
+      You may use the inbox controls, search, filters, email metadata, and message navigation as needed.
+    </p>
+
+    <p>
+      Open the requested email, review its contents, activate Continue, answer the question that follows, and submit your answer.
+    </p>
+
+    <section class="panel" aria-labelledby="requestedEmailHeading">
+      <h3 id="requestedEmailHeading">Requested Email</h3>
+      <p><strong>Sender:</strong> Maya Chen</p>
+      <p><strong>Subject:</strong> Q2 Accessibility Audit Request</p>
+    </section>
+
+    <p id="inboxTaskStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+
+    <section id="inboxView" class="panel" aria-labelledby="inboxHeading">
+      <h3 id="inboxHeading" tabindex="-1">Inbox</h3>
+
+      <div class="toolbar" aria-label="Inbox tools">
+        <div>
+          <label for="inboxSearchInput">Search inbox</label>
+          <input id="inboxSearchInput" type="text">
+        </div>
+
+        <div>
+          <label for="inboxPriorityFilter">Filter by priority</label>
+          <select id="inboxPriorityFilter">
+            <option value="all">All priorities</option>
+            <option value="High">High</option>
+            <option value="Normal">Normal</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+
+        <button id="inboxSearchBtn" class="btn" type="button">Search</button>
+        <button id="inboxRefreshBtn" class="btn secondary" type="button">Refresh Inbox</button>
+        <button id="inboxMarkReadBtn" class="btn secondary" type="button">Mark Selected as Read</button>
+        <button id="inboxArchiveBtn" class="btn secondary" type="button">Archive Selected</button>
+      </div>
+
+      <table>
+        <caption>Inbox messages</caption>
+        <thead>
+          <tr>
+            <th scope="col">Select</th>
+            <th scope="col">Status</th>
+            <th scope="col">Sender</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Received</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Category</th>
+          </tr>
+        </thead>
+        <tbody id="inboxBody"></tbody>
+      </table>
+    </section>
+
+    <section id="messageView" class="panel" aria-labelledby="messageHeading" hidden>
+      <div class="button-group" role="group" aria-label="Email navigation controls">
+        <button id="inboxReturnBtn" class="btn secondary" type="button">Return to Inbox</button>
+        <button id="inboxPreviousEmailBtn" class="btn secondary" type="button">Previous Email</button>
+        <button id="inboxNextEmailBtn" class="btn secondary" type="button">Next Email</button>
+      </div>
+
+      <h3 id="messageHeading" tabindex="-1">Opened Email</h3>
+
+      <p><strong>From:</strong> <span id="messageSender"></span></p>
+      <p><strong>Subject:</strong> <span id="messageSubject"></span></p>
+      <p><strong>Received:</strong> <span id="messageReceived"></span></p>
+      <p><strong>Priority:</strong> <span id="messagePriority"></span></p>
+      <p><strong>Category:</strong> <span id="messageCategory"></span></p>
+
+      <div id="messageBody" class="panel"></div>
+
+      <button id="inboxContinueBtn" class="block-btn" type="button">Continue</button>
+
+      <section id="inboxQuestionSection" class="panel" aria-labelledby="inboxQuestionHeading" hidden>
+        <h3 id="inboxQuestionHeading" tabindex="-1">Question</h3>
+
+        <p>What is the audit deadline stated in the email?</p>
+
+        <form id="inboxAnswerForm">
+          <fieldset>
+            <legend>Select one answer</legend>
+
+            <label><input name="deadlineAnswer" type="radio" value="June 14, 2026"> June 14, 2026</label>
+            <label><input name="deadlineAnswer" type="radio" value="June 21, 2026"> June 21, 2026</label>
+            <label><input name="deadlineAnswer" type="radio" value="July 1, 2026"> July 1, 2026</label>
+            <label><input name="deadlineAnswer" type="radio" value="July 15, 2026"> July 15, 2026</label>
+          </fieldset>
+
+          <button id="inboxSubmitAnswerBtn" class="btn" type="submit">Submit Answer</button>
+        </form>
+      </section>
+    </section>
+
+    <div class="button-group" role="group" aria-label="Inbox triage task controls">
+      <button id="inboxPreviousTaskBtn" class="btn secondary" type="button">Previous Task</button>
+    </div>
+  </section>
+
+  <section id="rosterTableSection" class="panel assessment-section" aria-labelledby="rosterTableHeading" hidden>
+    <p class="note">Progress: Task 5 of 5</p>
+    <h2 id="rosterTableHeading" tabindex="-1">Task 5 — Employee Roster Table Task</h2>
+
+    <p>
+      Activate <strong>Begin Table Task</strong> to display the employee roster.
+    </p>
+
+    <p>
+      Review the employee roster table and answer the three questions that follow it.
+    </p>
+
+    <p>
+      Enter your answers into the provided answer fields, review your responses, and activate <strong>Submit Answers</strong>.
+    </p>
+
+    <button id="rosterBeginTaskBtn" class="btn" type="button">Begin Table Task</button>
+
+    <section id="rosterTaskContent" hidden>
+      <h3 id="rosterTableContentHeading" tabindex="-1">Employee Roster</h3>
+
+      <p id="rosterTaskStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+
+      <table>
+        <caption>Employee roster for internal staff review.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Employee Name</th>
+            <th scope="col">Department</th>
+            <th scope="col">Role</th>
+            <th scope="col">Manager</th>
+            <th scope="col">Location</th>
+            <th scope="col">Status</th>
+            <th scope="col">Start Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Priya Shah</td>
+            <td>Finance</td>
+            <td>Payroll Specialist</td>
+            <td>Andre Miller</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>March 3, 2024</td>
+          </tr>
+          <tr>
+            <td>Marcus Green</td>
+            <td>Human Resources</td>
+            <td>Benefits Coordinator</td>
+            <td>Maya Chen</td>
+            <td>Remote</td>
+            <td>Active</td>
+            <td>August 19, 2023</td>
+          </tr>
+          <tr>
+            <td>Elena Torres</td>
+            <td>Training</td>
+            <td>Training Coordinator</td>
+            <td>RJ Holliday</td>
+            <td>Aurora</td>
+            <td>Active</td>
+            <td>January 8, 2025</td>
+          </tr>
+          <tr>
+            <td>Jordan Lee</td>
+            <td>Operations</td>
+            <td>Case Assistant</td>
+            <td>Nina Patel</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>May 14, 2026</td>
+          </tr>
+          <tr>
+            <td>Sofia Ramirez</td>
+            <td>Information Technology</td>
+            <td>Systems Analyst</td>
+            <td>Derek Stone</td>
+            <td>Boulder</td>
+            <td>Active</td>
+            <td>September 12, 2022</td>
+          </tr>
+          <tr>
+            <td>Andre Miller</td>
+            <td>Finance</td>
+            <td>Finance Manager</td>
+            <td>Linda Park</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>June 22, 2021</td>
+          </tr>
+          <tr>
+            <td>Nina Patel</td>
+            <td>Operations</td>
+            <td>Operations Lead</td>
+            <td>Carlos Rivera</td>
+            <td>Remote</td>
+            <td>Active</td>
+            <td>February 10, 2020</td>
+          </tr>
+          <tr>
+            <td>Derek Stone</td>
+            <td>Information Technology</td>
+            <td>IT Manager</td>
+            <td>Linda Park</td>
+            <td>Colorado Springs</td>
+            <td>Active</td>
+            <td>November 4, 2019</td>
+          </tr>
+          <tr>
+            <td>Maya Chen</td>
+            <td>Human Resources</td>
+            <td>HR Manager</td>
+            <td>Linda Park</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>April 16, 2018</td>
+          </tr>
+          <tr>
+            <td>Carlos Rivera</td>
+            <td>Operations</td>
+            <td>Operations Director</td>
+            <td>Linda Park</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>July 30, 2017</td>
+          </tr>
+          <tr>
+            <td>Aisha Coleman</td>
+            <td>Training</td>
+            <td>Learning Specialist</td>
+            <td>RJ Holliday</td>
+            <td>Remote</td>
+            <td>Active</td>
+            <td>October 2, 2023</td>
+          </tr>
+          <tr>
+            <td>Thomas Nguyen</td>
+            <td>Client Services</td>
+            <td>Client Support Specialist</td>
+            <td>Carlos Rivera</td>
+            <td>Aurora</td>
+            <td>Inactive</td>
+            <td>December 11, 2021</td>
+          </tr>
+          <tr>
+            <td>Grace Kim</td>
+            <td>Client Services</td>
+            <td>Account Coordinator</td>
+            <td>Carlos Rivera</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>May 6, 2024</td>
+          </tr>
+          <tr>
+            <td>RJ Holliday</td>
+            <td>Training</td>
+            <td>Training Manager</td>
+            <td>Linda Park</td>
+            <td>Remote</td>
+            <td>Active</td>
+            <td>February 18, 2019</td>
+          </tr>
+          <tr>
+            <td>Linda Park</td>
+            <td>Executive Office</td>
+            <td>Director of Administration</td>
+            <td>Executive Team</td>
+            <td>Denver</td>
+            <td>Active</td>
+            <td>January 7, 2016</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <section class="panel" aria-labelledby="rosterQuestionsHeading">
+        <h3 id="rosterQuestionsHeading">Roster Questions</h3>
+
+        <form id="rosterAnswerForm" class="stack" novalidate>
+          <label for="rosterAnswerDepartment">What department is Marcus Green assigned to?</label>
+          <input id="rosterAnswerDepartment" name="rosterAnswerDepartment" type="text" required>
+
+          <label for="rosterAnswerManager">Who is the manager for Priya Shah?</label>
+          <input id="rosterAnswerManager" name="rosterAnswerManager" type="text" required>
+
+          <label for="rosterAnswerEmployee">Which employee is listed as the Training Coordinator?</label>
+          <input id="rosterAnswerEmployee" name="rosterAnswerEmployee" type="text" required>
+
+          <button id="rosterSubmitAnswersBtn" class="btn" type="submit">Submit Answers</button>
+        </form>
+      </section>
+    </section>
+
+    <div class="button-group" role="group" aria-label="Employee roster table task controls">
+      <button id="rosterPreviousTaskBtn" class="btn secondary" type="button">Previous Task</button>
+    </div>
+
+    <p id="rosterAnswerStatus" role="alert" aria-live="assertive" aria-atomic="true"></p>
+  </section>
+
+</main>
+
+<div id="livePolite" aria-live="polite" aria-atomic="true" class="wrap" hidden></div>
+<div id="liveAssert" aria-live="assertive" aria-atomic="true" class="wrap" hidden></div>
+
+<script src="../js/app.js"></script>
+</body>
+</html>
